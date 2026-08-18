@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #1C1210;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(198, 84, 29, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 20%, rgba(107, 39, 55, 0.18), transparent);
+}
+
+/* subtle film-grain overlay, evokes photo memories rather than a flat gradient */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background-color: #C6541D;
+  color: #F6ECDD;
+}
+
+/* reduced motion respected globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #E3A857;
+  outline-offset: 3px;
+}
+
+/* mapa de memórias — escurece os tiles do OpenStreetMap pra combinar com a paleta */
+.leaflet-map-dark .leaflet-tile-pane {
+  filter: grayscale(35%) invert(94%) contrast(90%) brightness(95%) hue-rotate(180deg);
+}
+.leaflet-map-dark .leaflet-popup-content-wrapper,
+.leaflet-map-dark .leaflet-popup-tip {
+  background-color: #241713;
+  color: #F6ECDD;
+}
+.leaflet-map-dark .leaflet-popup-content strong {
+  color: #E3A857;
+}
+.leaflet-map-dark .leaflet-control-zoom a {
+  background-color: #241713;
+  color: #F6ECDD;
+  border-color: rgba(246, 236, 221, 0.15) !important;
+}
