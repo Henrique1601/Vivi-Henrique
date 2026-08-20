@@ -62,6 +62,15 @@ export const galleryPhotos = [
   "/photos/15.jpg",
   "/photos/16.jpg",
   "/photos/17.jpg",
+  "/photos/18.jpg",
+  "/photos/19.jpg",
+  "/photos/20.jpg",
+  "/photos/21.jpg",
+  "/photos/22.jpg",
+  "/photos/23.jpg",
+  "/photos/24.jpg",
+  "/photos/25.jpg",
+  "/photos/26.jpg",
 ];
 
 export type Place = {
@@ -101,6 +110,42 @@ export const places: Place[] = [
     note: "O restaurante favorito dela",
     lat: -23.9590184,
     lng: -46.341648,
+  },
+  {
+    label: "Nossa casa",
+    note: "Onde a rotina do dia a dia vira memória",
+    lat: -23.9454251,
+    lng: -46.3314629,
+  },
+  {
+    label: "Açaí da Barra",
+    note: "Aquele açaí de sempre, no Gonzaga",
+    lat: -23.967306,
+    lng: -46.3319435,
+  },
+  {
+    label: "Don Sushi",
+    note: "Jantar japonês especial",
+    lat: -23.9763295,
+    lng: -46.298916,
+  },
+  {
+    label: "D'Boa Quiosque",
+    note: "Um programa gostoso à beira-mar",
+    lat: -23.9913286,
+    lng: -46.304722,
+  },
+  {
+    label: "Vixe Bar Pompéia",
+    note: "Um dos nossos points pra sair",
+    lat: -23.9646342,
+    lng: -46.3452955,
+  },
+  {
+    label: "Assaí Atacadista",
+    note: "Até compras do dia a dia viram memória juntos",
+    lat: -23.9584962,
+    lng: -46.3338042,
   },
 ];
 

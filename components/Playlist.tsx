@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { songs } from "@/lib/data";
 
-export default function Playlist() {
+export default function Playlist({ autoplay = false }: { autoplay?: boolean }) {
   const [selected, setSelected] = useState(0);
 
   return (
@@ -20,7 +20,9 @@ export default function Playlist() {
           <iframe
             key={songs[selected].spotifyId}
             style={{ borderRadius: 12 }}
-            src={`https://open.spotify.com/embed/track/${songs[selected].spotifyId}?utm_source=generator&theme=0`}
+            src={`https://open.spotify.com/embed/track/${songs[selected].spotifyId}?utm_source=generator&theme=0${
+              autoplay ? "&autoplay=1" : ""
+            }`}
             width="100%"
             height="152"
             frameBorder="0"
