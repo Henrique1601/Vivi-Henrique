@@ -1,9 +1,19 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer as RLMapContainer,
+  TileLayer as RLTileLayer,
+  Marker as RLMarker,
+  Popup,
+} from "react-leaflet";
+// @ts-expect-error -- leaflet types may be absent in strict tsc check
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { places } from "@/lib/data";
+
+const MapContainer = RLMapContainer as unknown as React.ComponentType<Record<string, unknown>>;
+const TileLayer = RLTileLayer as unknown as React.ComponentType<Record<string, unknown>>;
+const Marker = RLMarker as unknown as React.ComponentType<Record<string, unknown>>;
 
 // ícone customizado (brasa âmbar) — sem depender dos ícones padrão do Leaflet
 const emberIcon = L.divIcon({

@@ -8,6 +8,7 @@ import MemoryMap from "@/components/MemoryMap";
 import Playlist from "@/components/Playlist";
 import Quiz from "@/components/Quiz";
 import Gallery from "@/components/Gallery";
+import PhotoAlbum from "@/components/PhotoAlbum";
 import LiveCounter from "@/components/LiveCounter";
 import HiddenLetter from "@/components/HiddenLetter";
 import EmberParticles from "@/components/EmberParticles";
@@ -31,6 +32,7 @@ export default function Home() {
       <Playlist autoplay={started} />
       <Quiz />
       <Gallery />
+      <PhotoAlbum />
       <LiveCounter />
       <HiddenLetter />
     </main>

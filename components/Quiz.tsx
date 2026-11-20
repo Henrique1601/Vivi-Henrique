@@ -22,8 +22,13 @@ const questions: Question[] = [
     correct: 2,
   },
   {
-    q: "Pergunta 3 (edite aqui)",
-    options: ["Opção A", "Opção B", "Opção C", "Opção D"],
+    q: "Nosso maior sonho é?",
+    options: [
+      "Construir nossa família juntos",
+      "Viajar o mundo todo",
+      "Ter nossa casa própria",
+      "Envelhecer lado a lado",
+    ],
     correct: 0,
   },
 ];
