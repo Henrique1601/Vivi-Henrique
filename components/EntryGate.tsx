@@ -23,13 +23,17 @@ export default function EntryGate({ onEnter }: { onEnter: () => void }) {
       <p className="font-script text-2xl text-rose">
         {couple.him} & {couple.her}
       </p>
-      <button
+      <motion.button
         onClick={onEnter}
-        className="border border-amber/40 px-6 py-3 font-body text-xs uppercase tracking-widest text-amber transition-colors hover:bg-amber/10"
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className="border border-amber/50 bg-amber/5 px-7 py-3.5 font-body text-xs uppercase tracking-widest text-amber shadow-[0_0_24px_rgba(198,84,29,0.15)] transition-colors hover:border-amber hover:bg-amber/15"
       >
         toque para começar
-      </button>
-      <p className="font-body text-[10px] text-cream/30">com música ❤️</p>
+      </motion.button>
+      <p className="font-body text-[11px] tracking-wide text-cream/60">
+        com música ❤️
+      </p>
     </motion.div>
   );
 }

@@ -12,6 +12,8 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center">
+      {/* brilho sutil de brasa ao fundo */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(198,84,29,0.12)_0%,transparent_62%)]" />
       {/* brasa única — o sinal da chama que vai crescer ao longo do site */}
       <motion.div
         initial={{ opacity: 0, scale: 0.6 }}
