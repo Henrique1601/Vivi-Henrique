@@ -71,7 +71,7 @@ export default function Gallery() {
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setFeedback(null);
-    const maxBytes = 25 * 1024 * 1024;
+    const maxBytes = 70 * 1024 * 1024;
     const validExt = /\.(jpe?g|png|webp|gif|avif|heic)$/i;
     const imageFiles = Array.from(files)
       .filter(
@@ -83,7 +83,7 @@ export default function Gallery() {
       .slice(0, 12);
 
     if (imageFiles.length === 0) {
-      setFeedback("Nenhuma imagem válida encontrada (máx. 25 MB por foto).");
+      setFeedback("Nenhuma imagem válida encontrada (máx. 70 MB por foto).");
       return;
     }
 
