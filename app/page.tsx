@@ -13,6 +13,9 @@ import PhotoAlbum from "@/components/PhotoAlbum";
 import LoveJar from "@/components/LoveJar";
 import LoveCoupons from "@/components/LoveCoupons";
 import BucketList from "@/components/BucketList";
+import MemoryGame from "@/components/MemoryGame";
+import TimeCapsule from "@/components/TimeCapsule";
+import ClickSparks from "@/components/ClickSparks";
 import LiveCounter from "@/components/LiveCounter";
 import HiddenLetter from "@/components/HiddenLetter";
 import EmberParticles from "@/components/EmberParticles";
@@ -25,6 +28,7 @@ export default function Home() {
     <main className="relative">
       <div className="grain-overlay" />
       <EmberParticles />
+      <ClickSparks />
 
       <AnimatePresence>
         {!started && <EntryGate key="gate" onEnter={() => setStarted(true)} />}
@@ -41,6 +45,8 @@ export default function Home() {
       <div id="pote"><LoveJar /></div>
       <div id="vales"><LoveCoupons /></div>
       <div id="planos"><BucketList /></div>
+      <div id="memoria"><MemoryGame /></div>
+      <div id="capsula"><TimeCapsule /></div>
       <div id="tempo"><LiveCounter /></div>
       <HiddenLetter />
     </main>
