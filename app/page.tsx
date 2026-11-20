@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import Hero from "@/components/Hero";
+import QuickNav from "@/components/QuickNav";
 import Timeline from "@/components/Timeline";
 import MemoryMap from "@/components/MemoryMap";
 import Playlist from "@/components/Playlist";
@@ -30,16 +31,17 @@ export default function Home() {
       </AnimatePresence>
 
       <Hero />
-      <Timeline />
-      <MemoryMap />
-      <Playlist autoplay={started} />
-      <Quiz />
-      <Gallery />
-      <PhotoAlbum />
-      <LoveJar />
-      <LoveCoupons />
-      <BucketList />
-      <LiveCounter />
+      <QuickNav />
+      <div id="timeline"><Timeline /></div>
+      <div id="mapa"><MemoryMap /></div>
+      <div id="playlist"><Playlist autoplay={started} /></div>
+      <div id="quiz"><Quiz /></div>
+      <div id="galeria"><Gallery /></div>
+      <div id="album"><PhotoAlbum /></div>
+      <div id="pote"><LoveJar /></div>
+      <div id="vales"><LoveCoupons /></div>
+      <div id="planos"><BucketList /></div>
+      <div id="tempo"><LiveCounter /></div>
       <HiddenLetter />
     </main>
   );

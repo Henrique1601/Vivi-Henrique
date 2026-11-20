@@ -64,9 +64,31 @@ export default function LiveCounter() {
         ))}
       </div>
 
-      <p className="mt-12 max-w-sm font-body text-sm text-cream/50">
+      <p className="mt-12 max-w-sm font-body text-sm text-cream/60">
         E o contador nunca para — assim como a gente também não pretende parar.
       </p>
+
+      {time && (
+        <p className="mt-4 font-body text-xs uppercase tracking-widest text-amber/80">
+          {Math.max(
+            0,
+            Math.ceil(
+              (new Date("2026-12-20T00:00:00-03:00").getTime() - Date.now()) /
+                (1000 * 60 * 60 * 24)
+            )
+          )}{" "}
+          dias para o nosso 1 ano
+        </p>
+      )}
+
+      <a
+        href="https://wa.me/?text=Oi%20amor%2C%20acabei%20de%20ver%20nosso%20site%20%E2%9D%A4%EF%B8%8F"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-8 border border-amber/40 bg-amber/10 px-6 py-3 font-body text-xs uppercase tracking-widest text-amber transition hover:border-amber hover:bg-amber/20"
+      >
+        💬 Tô com saudade
+      </a>
     </section>
   );
 }

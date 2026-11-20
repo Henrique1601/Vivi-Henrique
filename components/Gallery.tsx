@@ -36,6 +36,7 @@ export default function Gallery() {
   const [extraPhotos, setExtraPhotos] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -175,7 +176,8 @@ export default function Gallery() {
               whileHover={{ rotate: 0, scale: 1.05, zIndex: 10 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.45, delay: (i % 6) * 0.06 }}
-              className="group relative w-48 bg-cream p-3 pb-6 shadow-xl"
+              onClick={() => setLightboxIdx(i)}
+              className="group relative w-48 cursor-pointer bg-cream p-3 pb-6 shadow-xl"
             >
               {item.isExtra && (
                 <button
@@ -212,6 +214,64 @@ export default function Gallery() {
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Lightbox em tela cheia */}
+      <AnimatePresence>
+        {lightboxIdx !== null && allPhotos[lightboxIdx] && (
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Foto ampliada"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxIdx(null)}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-night/95 p-4 backdrop-blur-sm"
+          >
+            <button
+              type="button"
+              onClick={() => setLightboxIdx(null)}
+              aria-label="Fechar foto"
+              className="absolute right-6 top-6 text-2xl text-cream/70 hover:text-amber"
+            >
+              ×
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIdx((idx) =>
+                  idx === null ? null : (idx - 1 + allPhotos.length) % allPhotos.length
+                );
+              }}
+              aria-label="Foto anterior"
+              className="absolute left-4 top-1/2 -translate-y-1/2 border border-cream/20 bg-night/70 px-3 py-2 text-cream hover:border-amber hover:text-amber"
+            >
+              ←
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={allPhotos[lightboxIdx].src}
+              alt="Henrique e Vivian"
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-[85vh] max-w-[90vw] border-4 border-cream object-contain shadow-2xl"
+            />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIdx((idx) =>
+                  idx === null ? null : (idx + 1) % allPhotos.length
+                );
+              }}
+              aria-label="Próxima foto"
+              className="absolute right-4 top-1/2 -translate-y-1/2 border border-cream/20 bg-night/70 px-3 py-2 text-cream hover:border-amber hover:text-amber"
+            >
+              →
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
