@@ -25,7 +25,8 @@ export default function Playlist({ autoplay = false }: { autoplay?: boolean }) {
             }`}
             width="100%"
             height="152"
-            frameBorder="0"
+            className="border-0"
+            referrerPolicy="no-referrer"
             allowFullScreen
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"

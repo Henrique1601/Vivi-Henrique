@@ -43,7 +43,14 @@ export default function Gallery() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setExtraPhotos(parsed);
+        if (Array.isArray(parsed)) {
+          setExtraPhotos(
+            parsed.filter(
+              (x): x is string =>
+                typeof x === "string" && x.startsWith("data:image/")
+            )
+          );
+        }
       }
     } catch {
       // ignora erro de leitura do localStorage
@@ -61,9 +68,16 @@ export default function Gallery() {
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
-    const imageFiles = Array.from(files).filter((f) =>
-      f.type.startsWith("image/")
-    );
+    const allowedTypes = new Set([
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+    ]);
+    const maxBytes = 10 * 1024 * 1024;
+    const imageFiles = Array.from(files)
+      .filter((f) => allowedTypes.has(f.type) && f.size <= maxBytes)
+      .slice(0, 12);
     if (imageFiles.length === 0) return;
 
     setIsProcessing(true);
@@ -111,8 +125,12 @@ export default function Gallery() {
         onClick={() => inputRef.current?.click()}
         role="button"
         tabIndex={0}
+        aria-label="Adicionar fotos à galeria"
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
         }}
         className={`mx-auto mb-16 max-w-xl cursor-pointer border border-dashed px-6 py-8 text-center transition-all ${
           isDragging
@@ -167,7 +185,7 @@ export default function Gallery() {
                     removeExtra(item.extraIdx);
                   }}
                   aria-label="Remover foto adicionada"
-                  className="absolute -right-2 -top-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-wine text-xs text-cream opacity-0 shadow transition-opacity group-hover:opacity-100"
+                  className="absolute -right-2 -top-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-wine text-xs text-cream opacity-100 shadow transition-opacity focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                 >
                   ×
                 </button>
