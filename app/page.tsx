@@ -9,6 +9,9 @@ import Playlist from "@/components/Playlist";
 import Quiz from "@/components/Quiz";
 import Gallery from "@/components/Gallery";
 import PhotoAlbum from "@/components/PhotoAlbum";
+import LoveJar from "@/components/LoveJar";
+import LoveCoupons from "@/components/LoveCoupons";
+import BucketList from "@/components/BucketList";
 import LiveCounter from "@/components/LiveCounter";
 import HiddenLetter from "@/components/HiddenLetter";
 import EmberParticles from "@/components/EmberParticles";
@@ -33,6 +36,9 @@ export default function Home() {
       <Quiz />
       <Gallery />
       <PhotoAlbum />
+      <LoveJar />
+      <LoveCoupons />
+      <BucketList />
       <LiveCounter />
       <HiddenLetter />
     </main>
