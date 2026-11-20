@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { galleryPhotos, couple } from "@/lib/data";
@@ -12,6 +12,14 @@ type AlbumSpread = {
   captionRight: string;
   pageNumber: number;
 };
+
+type PageEdits = {
+  captions: Record<number, string>;
+  stickers: Record<number, string[]>;
+};
+
+const STORAGE_KEY = "vivi-henrique-album-edits";
+const AVAILABLE_STICKERS = ["❤️", "✨", "🕯️", "🥂", "🌙", "📸", "🌹", "🦋"];
 
 const captions = [
   "Cada momento ao seu lado vira meu lugar favorito.",
@@ -45,11 +53,19 @@ function PageContent({
   caption,
   pageNum,
   side,
+  stickers,
+  isEditing,
+  onCaptionChange,
+  onToggleSticker,
 }: {
   photo: string | null;
   caption: string;
   pageNum: number;
   side: "left" | "right";
+  stickers: string[];
+  isEditing?: boolean;
+  onCaptionChange?: (value: string) => void;
+  onToggleSticker?: (sticker: string) => void;
 }) {
   return (
     <div
@@ -69,15 +85,62 @@ function PageContent({
               sizes="(max-width: 768px) 100vw, 400px"
               className="object-cover"
             />
+            {stickers.length > 0 && (
+              <div className="pointer-events-none absolute right-2 top-2 flex flex-wrap gap-1">
+                {stickers.map((s, idx) => (
+                  <span
+                    key={`${s}-${idx}`}
+                    className="text-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="mt-5 flex items-end justify-between gap-4">
-            <p className="font-script text-xl leading-snug text-night/85">
-              {caption}
-            </p>
-            <span className="font-body text-[11px] text-night/40">
-              {pageNum}
-            </span>
-          </div>
+
+          {isEditing ? (
+            <div
+              className="mt-4 space-y-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <textarea
+                value={caption}
+                onChange={(e) => onCaptionChange?.(e.target.value)}
+                rows={2}
+                aria-label={`Legenda da página ${pageNum}`}
+                className="w-full resize-none border border-night/20 bg-white/70 px-3 py-2 font-script text-lg text-night focus:border-wine focus:outline-none"
+              />
+              <div className="flex flex-wrap items-center gap-1.5">
+                {AVAILABLE_STICKERS.map((s) => {
+                  const active = stickers.includes(s);
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => onToggleSticker?.(s)}
+                      className={`rounded border px-1.5 py-0.5 text-sm transition ${
+                        active
+                          ? "border-wine bg-wine/15"
+                          : "border-night/15 bg-white/50 opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="mt-5 flex items-end justify-between gap-4">
+              <p className="font-script text-xl leading-snug text-night/85">
+                {caption}
+              </p>
+              <span className="font-body text-[11px] text-night/45">
+                {pageNum}
+              </span>
+            </div>
+          )}
         </>
       ) : (
         <div className="flex h-full flex-col items-center justify-center border border-dashed border-night/20 p-8 text-center">
@@ -94,21 +157,70 @@ function PageContent({
 
 export default function PhotoAlbum() {
   const [currentSpread, setCurrentSpread] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [edits, setEdits] = useState<PageEdits>({
+    captions: {},
+    stickers: {},
+  });
   const [flipping, setFlipping] = useState<{
     from: number;
     to: number;
     dir: 1 | -1;
   } | null>(null);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as PageEdits;
+        if (parsed && typeof parsed === "object") {
+          setEdits({
+            captions: parsed.captions ?? {},
+            stickers: parsed.stickers ?? {},
+          });
+        }
+      }
+    } catch {
+      // ignora erro de leitura
+    }
+  }, []);
+
+  function saveEdits(next: PageEdits) {
+    setEdits(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignora erro de escrita
+    }
+  }
+
+  function updateCaption(pageNum: number, value: string) {
+    saveEdits({
+      ...edits,
+      captions: { ...edits.captions, [pageNum]: value },
+    });
+  }
+
+  function toggleSticker(pageNum: number, sticker: string) {
+    const current = edits.stickers[pageNum] ?? [];
+    const nextStickers = current.includes(sticker)
+      ? current.filter((s) => s !== sticker)
+      : [...current, sticker];
+    saveEdits({
+      ...edits,
+      stickers: { ...edits.stickers, [pageNum]: nextStickers },
+    });
+  }
+
   const totalSpreads = spreads.length;
 
   function goNext() {
-    if (flipping || currentSpread >= totalSpreads - 1) return;
+    if (isEditing || flipping || currentSpread >= totalSpreads - 1) return;
     setFlipping({ from: currentSpread, to: currentSpread + 1, dir: 1 });
   }
 
   function goPrev() {
-    if (flipping || currentSpread <= 0) return;
+    if (isEditing || flipping || currentSpread <= 0) return;
     setFlipping({ from: currentSpread, to: currentSpread - 1, dir: -1 });
   }
 
@@ -120,6 +232,10 @@ export default function PhotoAlbum() {
   const rightBase =
     flipping?.dir === 1 ? spreads[targetIndex] : spreads[activeIndex];
 
+  const getCaption = (pageNum: number, fallback: string) =>
+    edits.captions[pageNum] ?? fallback;
+  const getStickers = (pageNum: number) => edits.stickers[pageNum] ?? [];
+
   return (
     <section className="mx-auto max-w-5xl px-6 py-32">
       <div className="mb-14 text-center">
@@ -130,6 +246,13 @@ export default function PhotoAlbum() {
         <p className="mt-3 font-body text-xs uppercase tracking-widest text-cream/50">
           Clique nas páginas ou nos botões para folhear
         </p>
+        <button
+          type="button"
+          onClick={() => setIsEditing((e) => !e)}
+          className="mt-5 border border-amber/40 px-4 py-2 font-body text-xs uppercase tracking-widest text-amber transition hover:bg-amber/10"
+        >
+          {isEditing ? "✓ Concluir edição" : "✏️ Editar texto e stickers"}
+        </button>
       </div>
 
       {/* Palco 3D do Álbum */}
@@ -141,40 +264,61 @@ export default function PhotoAlbum() {
           {/* Lombada central */}
           <div className="pointer-events-none absolute inset-y-3 left-1/2 z-30 hidden w-7 -translate-x-1/2 bg-gradient-to-r from-black/45 via-amber/10 to-black/45 md:block" />
 
-          {/* Versão Desktop: Livro Aberto com Folha Girando na Lombada */}
+          {/* Versão Desktop */}
           <div
             className="relative hidden min-h-[430px] grid-cols-2 md:grid"
             style={{ transformStyle: "preserve-3d" }}
           >
-            {/* Base Esquerda */}
             <div
               onClick={goPrev}
-              className={currentSpread > 0 ? "cursor-pointer" : ""}
+              className={!isEditing && currentSpread > 0 ? "cursor-pointer" : ""}
             >
               <PageContent
                 photo={leftBase.leftPhoto}
-                caption={leftBase.captionLeft}
+                caption={getCaption(
+                  leftBase.pageNumber * 2 - 1,
+                  leftBase.captionLeft
+                )}
                 pageNum={leftBase.pageNumber * 2 - 1}
                 side="left"
+                stickers={getStickers(leftBase.pageNumber * 2 - 1)}
+                isEditing={isEditing}
+                onCaptionChange={(v) =>
+                  updateCaption(leftBase.pageNumber * 2 - 1, v)
+                }
+                onToggleSticker={(s) =>
+                  toggleSticker(leftBase.pageNumber * 2 - 1, s)
+                }
               />
             </div>
 
-            {/* Base Direita */}
             <div
               onClick={goNext}
               className={
-                currentSpread < totalSpreads - 1 ? "cursor-pointer" : ""
+                !isEditing && currentSpread < totalSpreads - 1
+                  ? "cursor-pointer"
+                  : ""
               }
             >
               <PageContent
                 photo={rightBase.rightPhoto}
-                caption={rightBase.captionRight}
+                caption={getCaption(
+                  rightBase.pageNumber * 2,
+                  rightBase.captionRight
+                )}
                 pageNum={rightBase.pageNumber * 2}
                 side="right"
+                stickers={getStickers(rightBase.pageNumber * 2)}
+                isEditing={isEditing}
+                onCaptionChange={(v) =>
+                  updateCaption(rightBase.pageNumber * 2, v)
+                }
+                onToggleSticker={(s) =>
+                  toggleSticker(rightBase.pageNumber * 2, s)
+                }
               />
             </div>
 
-            {/* Folha 3D que vira */}
             {flipping && (
               <motion.div
                 key={`${flipping.from}-${flipping.to}`}
@@ -197,7 +341,6 @@ export default function PhotoAlbum() {
                   flipping.dir === 1 ? "left-1/2" : "left-0"
                 }`}
               >
-                {/* Frente da folha */}
                 <div
                   className="absolute inset-0"
                   style={{ backfaceVisibility: "hidden" }}
@@ -205,21 +348,32 @@ export default function PhotoAlbum() {
                   {flipping.dir === 1 ? (
                     <PageContent
                       photo={spreads[flipping.from].rightPhoto}
-                      caption={spreads[flipping.from].captionRight}
+                      caption={getCaption(
+                        spreads[flipping.from].pageNumber * 2,
+                        spreads[flipping.from].captionRight
+                      )}
                       pageNum={spreads[flipping.from].pageNumber * 2}
                       side="right"
+                      stickers={getStickers(
+                        spreads[flipping.from].pageNumber * 2
+                      )}
                     />
                   ) : (
                     <PageContent
                       photo={spreads[flipping.from].leftPhoto}
-                      caption={spreads[flipping.from].captionLeft}
+                      caption={getCaption(
+                        spreads[flipping.from].pageNumber * 2 - 1,
+                        spreads[flipping.from].captionLeft
+                      )}
                       pageNum={spreads[flipping.from].pageNumber * 2 - 1}
                       side="left"
+                      stickers={getStickers(
+                        spreads[flipping.from].pageNumber * 2 - 1
+                      )}
                     />
                   )}
                 </div>
 
-                {/* Verso da folha */}
                 <div
                   className="absolute inset-0"
                   style={{
@@ -230,16 +384,28 @@ export default function PhotoAlbum() {
                   {flipping.dir === 1 ? (
                     <PageContent
                       photo={spreads[flipping.to].leftPhoto}
-                      caption={spreads[flipping.to].captionLeft}
+                      caption={getCaption(
+                        spreads[flipping.to].pageNumber * 2 - 1,
+                        spreads[flipping.to].captionLeft
+                      )}
                       pageNum={spreads[flipping.to].pageNumber * 2 - 1}
                       side="left"
+                      stickers={getStickers(
+                        spreads[flipping.to].pageNumber * 2 - 1
+                      )}
                     />
                   ) : (
                     <PageContent
                       photo={spreads[flipping.to].rightPhoto}
-                      caption={spreads[flipping.to].captionRight}
+                      caption={getCaption(
+                        spreads[flipping.to].pageNumber * 2,
+                        spreads[flipping.to].captionRight
+                      )}
                       pageNum={spreads[flipping.to].pageNumber * 2}
                       side="right"
+                      stickers={getStickers(
+                        spreads[flipping.to].pageNumber * 2
+                      )}
                     />
                   )}
                 </div>
@@ -247,13 +413,24 @@ export default function PhotoAlbum() {
             )}
           </div>
 
-          {/* Versão Mobile: página única empilhada */}
+          {/* Versão Mobile */}
           <div className="grid grid-cols-1 md:hidden">
             <PageContent
               photo={spreads[currentSpread].leftPhoto}
-              caption={spreads[currentSpread].captionLeft}
+              caption={getCaption(
+                spreads[currentSpread].pageNumber * 2 - 1,
+                spreads[currentSpread].captionLeft
+              )}
               pageNum={spreads[currentSpread].pageNumber * 2 - 1}
               side="left"
+              stickers={getStickers(spreads[currentSpread].pageNumber * 2 - 1)}
+              isEditing={isEditing}
+              onCaptionChange={(v) =>
+                updateCaption(spreads[currentSpread].pageNumber * 2 - 1, v)
+              }
+              onToggleSticker={(s) =>
+                toggleSticker(spreads[currentSpread].pageNumber * 2 - 1, s)
+              }
             />
           </div>
         </div>
@@ -263,7 +440,7 @@ export default function PhotoAlbum() {
           <button
             type="button"
             onClick={goPrev}
-            disabled={currentSpread === 0 || Boolean(flipping)}
+            disabled={isEditing || currentSpread === 0 || Boolean(flipping)}
             className="border border-cream/20 px-5 py-2 font-body text-xs uppercase tracking-widest text-cream transition hover:border-amber hover:text-amber disabled:cursor-not-allowed disabled:opacity-30"
           >
             ← Página anterior
@@ -276,7 +453,11 @@ export default function PhotoAlbum() {
           <button
             type="button"
             onClick={goNext}
-            disabled={currentSpread === totalSpreads - 1 || Boolean(flipping)}
+            disabled={
+              isEditing ||
+              currentSpread === totalSpreads - 1 ||
+              Boolean(flipping)
+            }
             className="border border-cream/20 px-5 py-2 font-body text-xs uppercase tracking-widest text-cream transition hover:border-amber hover:text-amber disabled:cursor-not-allowed disabled:opacity-30"
           >
             Próxima página →
