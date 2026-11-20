@@ -6,7 +6,6 @@ import {
   Marker as RLMarker,
   Popup,
 } from "react-leaflet";
-// @ts-expect-error -- leaflet types may be absent in strict tsc check
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { places } from "@/lib/data";
