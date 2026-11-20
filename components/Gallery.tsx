@@ -36,6 +36,7 @@ export default function Gallery() {
   const [extraPhotos, setExtraPhotos] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -69,24 +70,39 @@ export default function Gallery() {
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
-    const allowedTypes = new Set([
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ]);
-    const maxBytes = 10 * 1024 * 1024;
+    setFeedback(null);
+    const maxBytes = 25 * 1024 * 1024;
+    const validExt = /\.(jpe?g|png|webp|gif|avif|heic)$/i;
     const imageFiles = Array.from(files)
-      .filter((f) => allowedTypes.has(f.type) && f.size <= maxBytes)
+      .filter(
+        (f) =>
+          f.size <= maxBytes &&
+          f.type !== "image/svg+xml" &&
+          (f.type.startsWith("image/") || validExt.test(f.name))
+      )
       .slice(0, 12);
-    if (imageFiles.length === 0) return;
+
+    if (imageFiles.length === 0) {
+      setFeedback("Nenhuma imagem válida encontrada (máx. 25 MB por foto).");
+      return;
+    }
 
     setIsProcessing(true);
     try {
-      const compressed = await Promise.all(
+      const results = await Promise.allSettled(
         imageFiles.map((f) => compressImageToDataUrl(f))
       );
-      saveExtra([...extraPhotos, ...compressed]);
+      const compressed = results
+        .filter(
+          (r): r is PromiseFulfilledResult<string> => r.status === "fulfilled"
+        )
+        .map((r) => r.value);
+
+      if (compressed.length === 0) {
+        setFeedback("Não foi possível processar essa imagem. Tente JPG ou PNG.");
+      } else {
+        saveExtra([...extraPhotos, ...compressed]);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -160,6 +176,9 @@ export default function Gallery() {
         <p className="mt-2 font-body text-xs text-cream/60">
           Arraste e solte fotos aqui, ou clique para escolher do seu dispositivo
         </p>
+        {feedback && (
+          <p className="mt-2 font-body text-xs text-rose">{feedback}</p>
+        )}
       </div>
 
       <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-10">
