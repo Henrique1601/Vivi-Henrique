@@ -1,25 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Sora, Caveat } from "next/font/google";
 import "./globals.css";
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-});
-
-const sora = Sora({
-  subsets: ["latin"],
-  variable: "--font-sora",
-  weight: ["300", "400", "500", "600"],
-});
-
-const caveat = Caveat({
-  subsets: ["latin"],
-  variable: "--font-caveat",
-  weight: ["500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: "Henrique & Vivian — 8 meses",
@@ -46,8 +26,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Sora:wght@300;400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${fraunces.variable} ${sora.variable} ${caveat.variable} font-body bg-night text-cream antialiased`}
+        style={
+          {
+            "--font-fraunces": "'Fraunces', serif",
+            "--font-sora": "'Sora', sans-serif",
+            "--font-caveat": "'Caveat', cursive",
+          } as React.CSSProperties
+        }
+        className="font-body bg-night text-cream antialiased"
       >
         {children}
       </body>
